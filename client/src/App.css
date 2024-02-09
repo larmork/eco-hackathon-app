@@ -20,8 +20,15 @@ body {
 }
 
 body {
-  background-color: #d3e5ff;
+  background-color: rgb(229, 229, 226);
   filter:brightness(.9);
+}
+
+.map {
+  height: 800px;
+  width: 100vw;
+  position: relative;
+  filter: grayscale(.5);
 }
 
 .section {
@@ -97,9 +104,10 @@ body {
   max-width: 700px;
 }
 
-.home-image-section {
+.home-image {
   max-width: 600px;
   flex: 1;
+  filter:  grayscale(.92) saturate(250%) hue-rotate(170deg);
 }
 .home-text-section {
   width: 100%;
@@ -111,8 +119,10 @@ body {
   color: #000000;
   /* line-height: 5rem; */
   font-weight: 900;
-  text-align: center;
   margin-bottom: 1em;
+  position: relative;
+  margin-right: auto;
+  text-align: start;
 }
 .primary-text {
   font-size: clamp(1rem, 3vw, 1.5rem);
@@ -123,7 +133,7 @@ body {
 }
 .secondary-button {
   padding: 1rem 2.5rem;
-  background-color: #3f5ecb;
+  background-color: rgb(168, 187, 199);
   outline: none;
   border: none;
   border-radius: 5rem;

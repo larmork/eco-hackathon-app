@@ -66,18 +66,17 @@ function App() {
 
       <div className="home-banner-container">
         <div className="home-bannerImage-container">
-          <img src={BannerBackground} alt="" />
+          <img src={BannerBackground} className="home-image" alt="" />
         </div>
         <div className="home-text-section">
           <h1 className="primary-heading">
-            Проект хакатон писька писька
+          Решаем проблему стихийных свалок на побережье Азовского моря
           </h1>
           <p className="primary-text">
-            Healthy switcher chefs do all the prep work, like peeding, chopping
-            & marinating, so you can cook a fresh food.
+            Решаем проблему стихийных свалок на побережье Азовского моря
           </p>
           <button className="secondary-button">
-            Order Now <FiArrowRight />{" "}
+            Поддержать проект <FiArrowRight />{" "}
           </button>
         </div>
       </div>
