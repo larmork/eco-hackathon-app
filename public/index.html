@@ -10,34 +10,63 @@
       content="Web site created using create-react-app"
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=b1b93867-3e61-4dff-a4de-cc2998b27e7d&lang=ru_RU" type="text/javascript"></script>
-    <script type="text/javascript">
-      ymaps.ready(init);
-      function init(){
-          var myMap = new ymaps.Map("map", { center: [46.062615, 36.854095], zoom: 8 });
-      }
-  </script>
-  
-    <title>React App</title>
+    <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-database.js"></script>
+
+
+    <script async src="https://api-maps.yandex.ru/2.1/?apikey=b1b93867-3e61-4dff-a4de-cc2998b27e7d&lang=ru_RU"></script>
+    
+    <title>Litter</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <div id="map"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+    <script type="text/javascript">
+      window.onload = function() {
+        ymaps = window.ymaps;
+        ymaps.ready(init);
+        
+        function init() {
+  var myMap = new ymaps.Map("map", { center: [46.062615, 36.854095], zoom: 8 });
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+  myMap.controls.remove('geolocationControl');
+  myMap.controls.remove('searchControl');
+  myMap.controls.remove('trafficControl');
+  myMap.controls.remove('typeSelector');
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+  firebase.initializeApp(firebaseConfig);
+      var database = firebase.database();
+
+  database.ref('chats/id').once('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      var childData = childSnapshot.val();
+      
+      var latitude = childData.latitude;
+      var longitude = childData.longitude;
+      
+      var marker = new ymaps.Placemark([latitude, longitude]);
+      myMap.geoObjects.add(marker);
+    });
+  });
+};
+
+        var firebaseConfig = {
+                  "type": "service_account",
+                  "project_id": "literallylitter-968b9",
+                  "private_key_id": "d7cf7405154d684510b3cdcd510ccd2e1c597e4d",
+                  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDI4KzXR1AvhE24\nZ7Kx9i2lgrRZKdWccg+O4eZU6d7egdb0mraZS1YRcOOQVxCoXq0SOZM4MlRTk/3Q\nuWkgyVqbjZwWPmsnid5NRQxMP1zzRyI5mjpwGt0HEMP289Y16pJL8/wO7n9fpeeJ\nvrnb5KDnCLxE2c3a7QnOk0RT67ZsVKWdg82ELSbhvwTLe4ztAYbZYmSFIn2JMT6u\nxRLdxLSmP3vkh/e4/3Qrlbg48anFvmlFeEDlVVFksQJD+EuubL9i+bj85cCAfvAa\nK/9mV+irol9FCkGp9REqKJav5qE7GmqWTufVv9ro6Et+oeH4zX++S/hx85p8Myh1\nRzmKRNSzAgMBAAECggEAMRFUlvd3+ktmkrNd3oOkTcgaFqeV4rOn4j6C/V3tT0vG\n/pPmI5bX7MW3CJSD4KTTwN5ofDMrDwlY2AnaSKR2qgWSyYowsYVHVHeX0+4sXc6T\n6R8nxCeDswyg2athOWVVnBD6kokmeu4zGx4IF1MHDLhBCM5tLtt06E1nxNoQgvBR\ngsIwEGIYG4uCMZ3dZUDwmy2i4mzQVMtXHX5UK5TfhT7RKUuPRDayhIJMYjm9kBx4\nfkFG4iHlLuP8EX1bQhf8nyZY4IpvWhhTjLQ2RJTlSswQU+4E6dQFUGPErhp9j4RV\n5Q8Ync86HrjBq9VvNgmQ273El11DEoxEcyMb4MHTLQKBgQDlhJYL/eaXhAcsXmPx\nudXKE8xE+dBhGDV7bqIYCZ8UqFwWfAcVpbAxDDnEqrDPYsqSBqyVM91K8LAJAxRl\nCUjGJ7F//gay5q8fG9d3/TUr30a2z1llydN91s3l3cWbnl3AB5LVEdpohDMR8Ulr\nM+hmLxn2s7IUZniq69i9EJ4BFwKBgQDgDh+QeC00pODkTD6mOWDQwFZbKNmSL2Ak\nj75FS2kyCELoKTSeXvtkHBNsc3k8CHS/JHos/nanI6LEsqOWUAOKEotUn2m7sR3W\nLJr862hqHHIfxb8sfbp98kbJxQVvF5PPMh642sAp7b/D0jw67/avJaAaXjSQTGn7\nLwG2NvSyxQKBgQC/Zb2q6mTtXVCOE3jND+fUyIXDz3+SOJoBANVzrjJXC78fkPZn\nevBfNo7GDoG7r+q1s5MgKUwVPnnOSh8r0n45oMhIsBHuBqlrC9C3YxSALYXO1UL7\nuz7+5a52TmaHy5zqkmZEAMtd9UCRaeGL4JGhBQ5lyJxsnrdp8ZugrsbUqQKBgQCM\nr3GUZlGET89Cqrlf6IFpMoxG20SabRMCghuoKSzZlKRmYJFArEVP2+06WNuUHX8p\nEj+BBxr74f1vYvgjBwTh6rkAHsTmbNVeSU3cZ/h9QHVMi/95cUzrjnhyczrxQa23\nGTJ/QiQNb9LMo7LcExcjbQ214NdCkCiv5xk9EA7gPQKBgBdPqeYfT34neDYuRzaC\nFynnyQNU4/DZaWRwh5EjEoA1OmgZ1o0LpFLQPVECchRDaVzbVyYZ1DuR38I/+BLK\nnCWKARppGGW9BXz0LjVGmJ8GOMV/nCPJ2Q228y435joyBygVn1nK8ubdFbDc+BNN\nKFuK+HTELV7Ew5g553p47wIv\n-----END PRIVATE KEY-----\n",
+                  "client_email": "firebase-adminsdk-bbrov@literallylitter-968b9.iam.gserviceaccount.com",
+                  "client_id": "102065618659948813070",
+                  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                  "token_uri": "https://oauth2.googleapis.com/token",
+                  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-bbrov%40literallylitter-968b9.iam.gserviceaccount.com",
+                  "universe_domain": "googleapis.com"
+        };
+
+
+      };
+    </script>
   </body>
 </html>

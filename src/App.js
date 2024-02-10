@@ -8,7 +8,6 @@ import BannerBackground from "./Assets/home-banner-background.png";
 import { FiArrowDown } from "react-icons/fi";
 import { Container, Nav } from "react-bootstrap";
 import { Link } from "react-scroll";
-import azov from './Assets/azov.png'
 
 function App() {
 
@@ -54,11 +53,11 @@ function App() {
           <Link className="nav-link" to="research" spy={true} smooth={true} offset={-100} duration={500} href='/#research'>
               Как это работает?
           </Link>
-          <Link className="nav-link" to="blabla" spy={true} smooth={true} offset={-100} duration={500} href='/#blabla'>
+          <Link className="nav-link"  to="research" href='https://t.me/Literally_litter_bot'>
               Чат-бот
           </Link>
           <Link className="nav-link" to="blabala" spy={true} smooth={true} offset={-100} duration={500} href='/#blabala'>
-              Контакты
+              Мероприятия
           </Link>
         </Nav>
       </Container>
@@ -87,7 +86,7 @@ function App() {
 
 
       <div id='about' className='section'><About /></div>
-      <img src={azov} className="map"/>
+      
       <div id='research' className='section'><Work /></div>
       <div id='blabla' className='section'><Contact /></div>
       <div id='blabala' className='section'><Footer /></div>

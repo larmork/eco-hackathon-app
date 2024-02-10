@@ -24,13 +24,27 @@ body {
 }
 
 .map {
-  height: auto;
+  height: 800px;
   width: 100%;
   position: relative;
   filter: grayscale(.5);
   object-fit: cover;
   display: flex;
   align-items: center;
+}
+
+.event {
+  padding: 10px;
+  border: 3px solid rgb(180, 180, 180);
+  margin-bottom: 10px; 
+  border-radius: 1em;
+  margin-top: 1em;
+}
+
+.ya_map {
+	font-family: arial;
+	font-size: 12px;
+	color: #454545;
 }
 
 .section {
@@ -213,10 +227,20 @@ body {
   background-color: #f2f2f2;
   padding: 20px;
   text-align: center;
+  border-radius: 1em;
+}
+
+.work-section img {
+  max-width: 90px;
+  height: auto;
+  position: relative;
+  top: .6em;
 }
 
 .work-head {
   color: #333;
+  margin-top: 2em;
+  margin-bottom: 1em;
 }
 
 .primary-heading-work {
@@ -228,6 +252,7 @@ body {
 .info-boxes-img-container {
   height: 100px; /* Adjust as needed */
   background-color: #ccc;
+  border-radius: 1em;
 }
 
 .footer-wrapper {
