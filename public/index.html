@@ -15,18 +15,20 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=5681e1c7-d3a6-4635-b411-137a0873bf14&lang=ru_RU" type="text/javascript"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=b1b93867-3e61-4dff-a4de-cc2998b27e7d&lang=ru_RU" type="text/javascript"></script>
     <script type="text/javascript">
       ymaps.ready(init);
       function init(){
           var myMap = new ymaps.Map("map", { center: [46.062615, 36.854095], zoom: 8 });
       }
   </script>
+  
     <title>React App</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <div id="map"></div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

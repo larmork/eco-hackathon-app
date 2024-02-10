@@ -5,9 +5,10 @@ import Contact from "./Components/Contact";
 import Footer from "./Components/Footer";
 import React from "react";
 import BannerBackground from "./Assets/home-banner-background.png";
-import { FiArrowRight } from "react-icons/fi";
+import { FiArrowDown } from "react-icons/fi";
 import { Container, Nav } from "react-bootstrap";
 import { Link } from "react-scroll";
+import azov from './Assets/azov.png'
 
 function App() {
 
@@ -48,16 +49,16 @@ function App() {
       <Container>
         <Nav className="nav-it" >
           <Link className="nav-link" to="about" spy={true} smooth={true} offset={-100} duration={500} href='/#about'>
-              О проекте
+              Карта
           </Link>
           <Link className="nav-link" to="research" spy={true} smooth={true} offset={-100} duration={500} href='/#research'>
-              Исследование
+              Как это работает?
           </Link>
           <Link className="nav-link" to="blabla" spy={true} smooth={true} offset={-100} duration={500} href='/#blabla'>
-              Блабла
+              Чат-бот
           </Link>
           <Link className="nav-link" to="blabala" spy={true} smooth={true} offset={-100} duration={500} href='/#blabala'>
-              Блабала
+              Контакты
           </Link>
         </Nav>
       </Container>
@@ -73,10 +74,12 @@ function App() {
           Решаем проблему стихийных свалок на побережье Азовского моря
           </h1>
           <p className="primary-text">
-            Решаем проблему стихийных свалок на побережье Азовского моря
+            Экоактивисты хотят проводить субботники, но надо определять точки наиболее эффективного приложения усилий.
+        Туристы хотят гулять по чистым местам, но регулярно обнаруживают мусорные свалки
+
           </p>
           <button className="secondary-button">
-            Поддержать проект <FiArrowRight />{" "}
+            <Link className="nav-link" to="about" spy={true} smooth={true} offset={-100} duration={500} href='/#about'>Смотреть карту <FiArrowDown className="arrow-down" />{" "}</Link>
           </button>
         </div>
       </div>
@@ -84,6 +87,7 @@ function App() {
 
 
       <div id='about' className='section'><About /></div>
+      <img src={azov} className="map"/>
       <div id='research' className='section'><Work /></div>
       <div id='blabla' className='section'><Contact /></div>
       <div id='blabala' className='section'><Footer /></div>
