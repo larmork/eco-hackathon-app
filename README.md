@@ -1,70 +1,59 @@
-# Getting Started with Create React App
+# Мусор возле моря 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Всякий мусор — это недостаточно подготовленное вторсырьё. Эта задача — про то, как создать инструменты для сообщества людей, неравнодушных к чистоте природы.
+## 1.⁠ ⁠В какой области решаем проблему?
+На берегах моря регулярно появляются скопления мусора. Этот мусор бывает разных видов и разного происхождения: иногда это автомобильные покрышки, иногда это жестяные бочки, иногда это крупный или мелкий пластик: пакеты, упаковка, бутылки и другие пластиковые изделия различных форм и цветов. Иногда это бывают стволы упавших деревьев, которые вынесло рекой в море, а потом пригнало ветром к берегу. А один из самых опасных видов морского мусора — это выброшенные рыболовные сети. На берегу в них запутываются и погибают птицы и другие животные, в море в них часто путаются и гибнут дельфины.
+Иногда мусор оставляют на берегу люди — несознательные туристы или местные жители, сходившие на пикник. Иногда мусор выносит потоками воды (от дождей или таяния снега) из оврагов, в которых люди устроили свалки. Мусор может лежать на берегу плотно как свалка, или может валяться вразброс, когда его вынесло на берег ветром, волнами или течением.
+Так или иначе — это неполезно для фауны, неэстетично и антисанитарно.
+## 2.⁠ ⁠Что за проблема, и кто вовлечен в ситуацию?
+(какие есть стейкхолдеры / целевые аудитории и их сегменты)?
+Экоактивисты
+Туристы / отдыхающие, в том числе дети
+Местные жители
+Сотрудники органов местного самоуправления
+Оператор раздельного сбора мусора/вторсырья
+## 3.⁠ ⁠Чья это проблема? 
+Кто лично хочет что-то получить, и почему не может?
+Возможные сценарии:
+Экоактивисты хотят проводить субботники, но надо определять точки наиболее эффективного приложения усилий.
+Туристы хотят гулять по чистым местам, но регулярно обнаруживают мусорные свалки
+Региональный мусорный оператор готов забирать раздельно собранный мусор после субботников, но надо чтоб это происходило организованным образом
+## 4.⁠ ⁠Какие есть (если есть) исходные данные / датасеты для решения такой проблемы? 
+Где их искать/собирать/парсить?
+Можно поискать датасеты с мусором на берегах на kaggle.com
+Можно запросить датасеты про мусор на берегах у Кроноцкого заповедника и волонтеров, разрабатывавших систему распознавания для него (в том числе в Яндексе)
 
-## Available Scripts
 
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 5.⁠ ⁠Какие есть инструменты/методы, которыми такие проблемы решают?
+Различные геоинформационные системы и инструменты (ГИС):
+https://www.ushahidi.com/ - движок для построения сайтов, посвященных организации волонтеров и активистов и решению общественных проблем
+https://fixmystreet.org/ - Платформа для создания аналогов британского сайта http://fixmystreet.com. Написана на языке Perl, возможно далеко не всем подойдет. 
+https://geosemantica.ru/platforma_geosemantica - платформа для создания интерактивных карт
+https://nextgis.ru/ - еще одна платформа для создания сложных геоинформационных систем (ГИС).
+https://yandex.ru/maps-api/ API Яндекс карт
+https://www.mapbox.com/ - библиотека для построения картографических приложений (веб и мобильных)
+https://leafletjs.com/ - еще одна библиотека для построения картографических приложений (веб и мобильных)
+Инструменты компьютерного зрения для обработки изображений и выделения объектов на них:
+YOLO (you only look once) для распознавания объектов на картах
+https://pjreddie.com/darknet/yolo/ 
+https://yolov8.com/ 
+OpenCV для обработки фотоснимков
+https://opencv.org/ 
+## 6.⁠ ⁠Какой есть известный опыт в решении такого рода проблем?
+Существующие государственные сервисы
+https://pos.gosuslugi.ru/landing/ - Госуслуги - решаем вместе. Основной недостаток - если госорган напишет, что вопрос решен (даже если проблема не решена фактически) — то отметка пропадает и люди не могут самоорганизоваться, чтобы убрать мусор самостоятельно.
+https://gorod.mos.ru/ - Наш город - московский сайт и набор приложений для сообщения о проблемах. Та же ситуация, что и с госуслугами.
+https://kartasvalok.ru/ - проект ОНФ, который сейчас закрыт и свалок на нем не отмечено.
+Видео о том, как раньше работала карта https://www.youtube.com/watch?v=EBhB2Rlr2PU 
+Аналоги есть в разных регионах РФ и в других странах, например
+https://fixmystreet.com - одно из самых первых подобных приложений, разработанное в Великобритании
+Гражданские проекты:
+https://greenfront.su/eco-map/ - карта экологических нарушений общественной организации Зеленый фронт.
+https://t.me/greengreenevn_bot - чат-бот ереванского сообщества экоактивистов GreenGreen https://t.me/greengreen_ch, позволяющий отправлять информацию о стихийных свалках мусора в Ереване.
+Технически близкие решения:
+https://dtp-stat.ru/ - сайт про статистику ДТП с картой-каталогом и аналитикой поверх неё
+https://recyclemap.ru/  - сайт с картой-каталогом точек раздельного сбора мусора
+https://rodniki.kp.ru/ - родники Ленинградской области - пример интерактивная карта с большим количеством информации
+https://activatica.org/ - портал, посвященный гражданскому активизму - с картой проблем и лентой новостей
+⁠https://clear-horizon.org  - онлайн-сервис для сообщений о ландшафтных пожарах и реагирования на них
+Решения по распознаванию мусора на снимках с дронов, которые разрабатывали на хакатоне WildHack для Кроноцкого заповедника
