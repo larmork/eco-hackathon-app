@@ -78,7 +78,14 @@ function App() {
 
           </p>
           <button className="secondary-button">
-            <Link className="nav-link" to="about" spy={true} smooth={true} offset={-100} duration={500} href='/#about'>Смотреть карту <FiArrowDown className="arrow-down" />{" "}</Link>
+            <Link 
+            className="nav-link" to="about" 
+            spy={true} smooth={true} 
+            offset={-100} duration={500} 
+            href='/#about'>
+              Смотреть карту 
+              <FiArrowDown className="arrow-down" />{" "}
+            </Link>
           </button>
         </div>
       </div>

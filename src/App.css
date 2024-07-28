@@ -1,8 +1,9 @@
 * {
-  margin: 0;
-  padding: 0;
+  margin: -4px;
+  padding: 2px;
   box-sizing: border-box;
   font-family: Tahoma !important;
+  font-size: 100%;
 }
 img {
   max-width: 100%;
@@ -80,13 +81,15 @@ body {
   text-decoration: none;
   color: #000000b7;
   font-size: 18px;
-  transition: all .5s;
+  transition: all 0.5s ease-out;
 }
 
 .nav-link:hover {
   text-decoration: none;
   color: #000000;
+  font-size: large;
   font-size: 20px;
+
 }
 
 .nav-link .active {
@@ -139,12 +142,12 @@ body {
 .primary-text {
   font-size: clamp(1rem, 3vw, 1.5rem);
   color: #000000b7;
-  margin: 1.5rem 0rem;
+  margin: 0rem 0rem;
   text-align: start;
   margin-bottom: 5em;
 }
 .secondary-button {
-  padding: 1rem 2.5rem;
+  padding: 2rem 2.5rem;
   background-color: rgb(168, 187, 199);
   outline: none;
   border: none;
@@ -160,7 +163,7 @@ body {
   max-width: 20vw;
   text-align: center;
   position: relative;
-  left: 38%;
+  left: 43%;
   margin-bottom: 10em;
 }
 .secondary-button svg {
@@ -210,7 +213,7 @@ body {
     text-align: center;
   }
   .arrow-down {
-    display: none;
+    display: flex;
   }
   .work-section-wrapper {
     flex-direction: column;
