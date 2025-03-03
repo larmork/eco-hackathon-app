@@ -74,17 +74,20 @@ function App() {
           </h1>
           <p className="primary-text">
             Экоактивисты хотят проводить субботники, но надо определять точки наиболее эффективного приложения усилий.
-        Туристы хотят гулять по чистым местам, но регулярно обнаруживают мусорные свалки
-
+            Туристы хотят гулять по чистым местам, но регулярно обнаруживают мусорные свалки
           </p>
           <button className="secondary-button">
             <Link 
-            className="nav-link" to="about" 
-            spy={true} smooth={true} 
-            offset={-100} duration={500} 
-            href='/#about'>
-              Смотреть карту 
-              <FiArrowDown className="arrow-down" />{" "}
+              className="nav-link" 
+              to="about" 
+              spy={true} 
+              smooth={true} 
+              offset={-100} 
+              duration={500} 
+              href='/#about'
+            >
+              Открыть карту
+              <FiArrowDown className="arrow-down" />
             </Link>
           </button>
         </div>
