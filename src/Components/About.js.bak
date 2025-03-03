@@ -1,0 +1,356 @@
+import React, { useState, useEffect } from "react";
+
+const WelcomeMessage = ({ onClose }) => {
+  return (
+    <div className="welcome-message">
+      <div className="welcome-content">
+        <h2>Welcome to the Interactive Map! 🗺️</h2>
+        <div className="instructions">
+          <p><strong>How to use:</strong></p>
+          <ul>
+            <li>👆 Click anywhere on the map to add a new pin</li>
+            <li>📝 Add title and description to mark important locations</li>
+            <li>🗑️ Remove pins you no longer need</li>
+            <li>👀 Click on existing pins to view details</li>
+          </ul>
+        </div>
+        <button onClick={onClose}>Got it!</button>
+      </div>
+    </div>
+  );
+};
+
+const PinModal = ({ pin, onSave, onClose }) => {
+  const [title, setTitle] = useState(pin?.title || '');
+  const [description, setDescription] = useState(pin?.description || '');
+  const [category, setCategory] = useState(pin?.category || 'general');
+
+  const categories = [
+    { value: 'general', label: '📍 General', color: 'blue' },
+    { value: 'warning', label: '⚠️ Warning', color: 'red' },
+    { value: 'info', label: 'ℹ️ Information', color: 'green' },
+    { value: 'event', label: '🎉 Event', color: 'purple' }
+  ];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave({ 
+      ...pin, 
+      title, 
+      description, 
+      category,
+      created: pin.created || new Date().toISOString()
+    });
+    onClose();
+  };
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3>{pin.id ? 'Edit Pin' : 'New Pin'}</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Category:</label>
+            <select 
+              value={category} 
+              onChange={(e) => setCategory(e.target.value)}
+              className="category-select"
+            >
+              {categories.map(cat => (
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Title:</label>
+            <input 
+              type="text" 
+              value={title} 
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter a title for this location"
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            <label>Description:</label>
+            <textarea 
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe this location..."
+              required
+              className="form-textarea"
+            />
+          </div>
+          <div className="form-group">
+            <label>Location:</label>
+            <p className="coordinates">
+              📍 Latitude: {pin?.latitude.toFixed(6)}
+              <br />
+              📍 Longitude: {pin?.longitude.toFixed(6)}
+            </p>
+          </div>
+          {pin.created && (
+            <div className="form-group">
+              <label>Created:</label>
+              <p className="date">{new Date(pin.created).toLocaleString()}</p>
+            </div>
+          )}
+          <div className="modal-buttons">
+            <button type="submit" className="btn-save">Save Location</button>
+            <button type="button" onClick={onClose} className="btn-cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const SidePanel = ({ pins, onSelect, onDelete }) => {
+  const [filter, setFilter] = useState('all');
+
+  const filteredPins = filter === 'all' 
+    ? pins 
+    : pins.filter(pin => pin.category === filter);
+
+  const categories = [
+    { value: 'all', label: '🗺️ All Pins' },
+    { value: 'general', label: '📍 General' },
+    { value: 'warning', label: '⚠️ Warning' },
+    { value: 'info', label: 'ℹ️ Information' },
+    { value: 'event', label: '🎉 Event' }
+  ];
+
+  return (
+    <div className="side-panel">
+      <h3>Saved Locations ({pins.length})</h3>
+      <div className="filter-section">
+        <select 
+          value={filter} 
+          onChange={(e) => setFilter(e.target.value)}
+          className="category-filter"
+        >
+          {categories.map(cat => (
+            <option key={cat.value} value={cat.value}>{cat.label}</option>
+          ))}
+        </select>
+      </div>
+      <div className="pins-list">
+        {filteredPins.map(pin => (
+          <div key={pin.id} className={`pin-item category-${pin.category}`}>
+            <div onClick={() => onSelect(pin)} className="pin-content">
+              <h4>{pin.title}</h4>
+              <p className="pin-description">{pin.description}</p>
+              <p className="pin-meta">
+                <span className="pin-date">{new Date(pin.created).toLocaleString()}</span>
+                <br />
+                <span className="pin-coords">
+                  Lat: {pin.latitude.toFixed(6)}, Lng: {pin.longitude.toFixed(6)}
+                </span>
+              </p>
+            </div>
+            <button onClick={() => onDelete(pin.id)} className="btn-delete">
+              🗑️ Remove
+            </button>
+          </div>
+        ))}
+        {filteredPins.length === 0 && (
+          <div className="no-pins">
+            No pins in this category. Click on the map to add one!
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const About = () => {
+  const [map, setMap] = useState(null);
+  const [userPlacemarks, setUserPlacemarks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedPin, setSelectedPin] = useState(null);
+  const [showSidePanel, setShowSidePanel] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  // Initialize map
+  useEffect(() => {
+    async function initMap() {
+      try {
+        if (!window.ymaps3) {
+          throw new Error('Yandex Maps API not loaded');
+        }
+
+        await window.ymaps3.ready;
+        const { YMap, YMapDefaultSchemeLayer } = window.ymaps3;
+
+        const mapInstance = new YMap(
+          document.getElementById('map'),
+          {
+            location: {
+              center: [36.854095, 46.062615],
+              zoom: 8
+            }
+          }
+        );
+
+        mapInstance.addChild(new YMapDefaultSchemeLayer());
+        
+        // Add click handler
+        mapInstance.addEventListener('click', (e) => {
+          const coords = e.coordinates;
+          const newPin = {
+            id: Date.now().toString(),
+            latitude: coords[1],
+            longitude: coords[0],
+            title: '',
+            description: '',
+            category: 'general',
+            created: new Date().toISOString()
+          };
+          setSelectedPin(newPin);
+        });
+
+        setMap(mapInstance);
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Map initialization error:', err);
+        setError(err.message);
+        setIsLoading(false);
+      }
+    }
+
+    initMap();
+
+    return () => {
+      if (map) {
+        map.destroy();
+      }
+    };
+  }, []);
+
+  // Load user placemarks from localStorage
+  useEffect(() => {
+    const savedPlacemarks = localStorage.getItem('userPlacemarks');
+    if (savedPlacemarks) {
+      setUserPlacemarks(JSON.parse(savedPlacemarks));
+    }
+    
+    // Check if user has seen welcome message
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+    if (hasSeenWelcome) {
+      setShowWelcome(false);
+    }
+  }, []);
+
+  // Save user placemarks to localStorage
+  useEffect(() => {
+    localStorage.setItem('userPlacemarks', JSON.stringify(userPlacemarks));
+  }, [userPlacemarks]);
+
+  // Update markers on map
+  useEffect(() => {
+    if (!map || !window.ymaps3) return;
+
+    const { YMapMarker } = window.ymaps3;
+
+    // Clear existing markers
+    map.removeAllChildren();
+    map.addChild(new window.ymaps3.YMapDefaultSchemeLayer());
+
+    // Add user markers
+    userPlacemarks.forEach(mark => {
+      const marker = new YMapMarker(
+        {
+          coordinates: [mark.longitude, mark.latitude]
+        },
+        document.createElement('div')
+      );
+
+      // Set emoji based on category
+      const categoryEmojis = {
+        general: '📍',
+        warning: '⚠️',
+        info: 'ℹ️',
+        event: '🎉'
+      };
+
+      marker.element.innerHTML = categoryEmojis[mark.category] || '📍';
+      marker.element.title = mark.title;
+      marker.element.style.cursor = 'pointer';
+      marker.element.onclick = () => handlePinClick(mark);
+      map.addChild(marker);
+    });
+  }, [map, userPlacemarks]);
+
+  const handlePinSave = (updatedPin) => {
+    if (userPlacemarks.find(p => p.id === updatedPin.id)) {
+      setUserPlacemarks(prev => 
+        prev.map(p => p.id === updatedPin.id ? updatedPin : p)
+      );
+    } else {
+      setUserPlacemarks(prev => [...prev, updatedPin]);
+    }
+    setSelectedPin(null);
+  };
+
+  const handlePinDelete = (pinId) => {
+    if (window.confirm('Are you sure you want to delete this pin?')) {
+      setUserPlacemarks(prev => prev.filter(p => p.id !== pinId));
+    }
+  };
+
+  const handlePinClick = (pin) => {
+    setSelectedPin(pin);
+  };
+
+  const handleCloseWelcome = () => {
+    setShowWelcome(false);
+    localStorage.setItem('hasSeenWelcome', 'true');
+  };
+
+  if (isLoading) {
+    return <div className="map">Loading map...</div>;
+  }
+
+  if (error) {
+    return <div className="map">Error loading map: {error}</div>;
+  }
+
+  return (
+    <div className="map-container">
+      {showWelcome && <WelcomeMessage onClose={handleCloseWelcome} />}
+      
+      <button 
+        className="toggle-panel-button"
+        onClick={() => setShowSidePanel(!showSidePanel)}
+      >
+        {showSidePanel ? '← Hide Panel' : '→ Show Panel'}
+      </button>
+
+      {showSidePanel && (
+        <SidePanel 
+          pins={userPlacemarks}
+          onSelect={handlePinClick}
+          onDelete={handlePinDelete}
+        />
+      )}
+
+      <div id="map" className="map">
+        <div className="map-tooltip">
+          Click anywhere on the map to add a new pin
+        </div>
+      </div>
+
+      {selectedPin && (
+        <PinModal
+          pin={selectedPin}
+          onSave={handlePinSave}
+          onClose={() => setSelectedPin(null)}
+        />
+      )}
+    </div>
+  );
+};
+
+export default About;
