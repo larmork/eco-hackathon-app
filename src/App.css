@@ -310,6 +310,33 @@ body {
   margin-right: -50px;
 }
 
+.map {
+  flex: 1;
+  height: 100%;
+  position: relative;
+}
+
+/* Yandex Maps Styles */
+.ymaps-2-1-79-map {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.ymaps-2-1-79-balloon__content {
+  padding: 15px;
+  max-width: 300px;
+}
+
+.ymaps-2-1-79-balloon__layout {
+  border-radius: 8px;
+}
+
+.ymaps-2-1-79-balloon__content strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+}
+
 .side-panel {
   width: 350px;
   background: white;
@@ -436,12 +463,6 @@ body.modal-open {
 .modal-buttons button[type="button"] {
   background: #f44336;
   color: white;
-}
-
-.map {
-  flex: 1;
-  height: 100%;
-  position: relative;
 }
 
 @media screen and (max-width: 768px) {

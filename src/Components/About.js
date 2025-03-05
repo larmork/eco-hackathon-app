@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { YMaps, Map, Placemark } from '@pbe/react-yandex-maps';
 import { useDatabase } from '../hooks/useDatabase';
+
+const mapState = {
+  center: [46.062615, 36.854095],
+  zoom: 8,
+  controls: ['zoomControl', 'fullscreenControl']
+};
 
 const mapContainerStyle = {
   width: "100%",
@@ -11,6 +17,8 @@ const center = {
   lat: 46.062615,
   lng: 36.854095,
 };
+
+const libraries = ["places"];
 
 const WelcomeMessage = ({ onClose }) => {
   return (
@@ -73,7 +81,6 @@ const PinModal = ({ pin, onSave, onClose }) => {
       updatedAt: now
     };
 
-    // Create history entry if status or size changed
     const history = pin.history || [];
     if (pin.id && (status !== pin.status || size !== pin.size)) {
       history.push({
@@ -254,11 +261,10 @@ const SidePanel = ({ pins, onSelect, onDelete }) => {
   const [filter, setFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('date'); // 'date', 'status', 'size'
-  const [sortOrder, setSortOrder] = useState('desc'); // 'asc', 'desc'
-  const [groupBy, setGroupBy] = useState('none'); // 'none', 'status', 'category'
+  const [sortBy, setSortBy] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [groupBy, setGroupBy] = useState('none');
 
-  // Filter pins
   const filteredPins = pins
     .filter(pin => filter === 'all' || pin.category === filter)
     .filter(pin => statusFilter === 'all' || pin.status === statusFilter)
@@ -268,7 +274,6 @@ const SidePanel = ({ pins, onSelect, onDelete }) => {
       pin.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  // Sort pins
   const sortedPins = [...filteredPins].sort((a, b) => {
     if (sortBy === 'date') {
       return sortOrder === 'desc' 
@@ -290,7 +295,6 @@ const SidePanel = ({ pins, onSelect, onDelete }) => {
     return 0;
   });
 
-  // Group pins
   const groupedPins = () => {
     if (groupBy === 'none') return { 'Все метки': sortedPins };
     
@@ -485,11 +489,9 @@ const About = () => {
   const { pins: dbPins, loading: dbLoading, error: dbError, addPin, updatePin, deletePin, loadPins } = useDatabase();
   const [selectedPin, setSelectedPin] = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
-  const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState(null);
   const mapRef = useRef(null);
 
-  // Load welcome message preference
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
     if (hasSeenWelcome) {
@@ -497,7 +499,6 @@ const About = () => {
     }
   }, []);
 
-  // Handle modal body scroll
   useEffect(() => {
     if (selectedPin) {
       document.body.classList.add('modal-open');
@@ -507,23 +508,11 @@ const About = () => {
     return () => document.body.classList.remove('modal-open');
   }, [selectedPin]);
 
-  const handleMapLoad = useCallback((map) => {
-    console.log('Map loaded');
-    mapRef.current = map;
-    setMapLoaded(true);
-  }, []);
-
-  const handleMapError = useCallback((error) => {
-    console.error('Map error:', error);
-    setMapError('Failed to load Google Maps');
-  }, []);
-
-  const handleMapClick = useCallback((event) => {
-    if (!event.latLng) return;
-    
+  const handleMapClick = useCallback((e) => {
+    const coords = e.get('coords');
     const newPin = {
-      lat: event.latLng.lat(),
-      lng: event.latLng.lng(),
+      lat: coords[0],
+      lng: coords[1],
       title: '',
       description: '',
       category: 'general',
@@ -550,7 +539,6 @@ const About = () => {
         await addPin(pin);
       }
       setSelectedPin(null);
-      // Reload pins to ensure we have the latest data
       await loadPins();
     } catch (err) {
       console.error('Error saving pin:', err);
@@ -562,7 +550,6 @@ const About = () => {
     if (window.confirm('Вы уверены, что хотите удалить эту метку?')) {
       try {
         await deletePin(pinId);
-        // Reload pins to ensure we have the latest data
         await loadPins();
       } catch (err) {
         console.error('Error deleting pin:', err);
@@ -593,7 +580,7 @@ const About = () => {
     plastic: '♻️'
   };
 
-  if (dbLoading && !mapLoaded) {
+  if (dbLoading) {
     return (
       <div className="map-container">
         <div style={{ 
@@ -662,88 +649,70 @@ const About = () => {
         <div className="map-tooltip">
           Нажмите в любом месте карты, чтобы добавить метку
         </div>
-        {!process.env.REACT_APP_GOOGLE_MAPS_API_KEY ? (
-          <div className="map-error">
-            <h3>Ошибка загрузки карты</h3>
-            <p>API ключ Google Maps не найден. Пожалуйста, проверьте файл .env</p>
-          </div>
-        ) : (
-          <LoadScript 
-            googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
-            onError={(error) => {
-              console.error('Google Maps Script Error:', error);
-              setMapError('Ошибка загрузки Google Maps: ' + (error.message || 'Проверьте консоль для деталей'));
+        <YMaps query={{ apikey: 'b1b93867-3e61-4dff-a4de-cc2998b27e7d' }}>
+          <Map
+            defaultState={mapState}
+            width="100%"
+            height="100%"
+            onClick={handleMapClick}
+            onLoad={(ymaps) => {
+              console.log('Map loaded');
+              mapRef.current = ymaps;
             }}
-            onLoad={() => {
-              console.log('Google Maps Script loaded successfully');
-              setMapError(null);
-            }}
-            loadingElement={
-              <div style={{ height: '100%' }}>
-                <div style={{ 
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  textAlign: 'center'
-                }}>
-                  Загрузка карты...
-                </div>
-              </div>
-            }
+            modules={[
+              'geoObject.addon.balloon',
+              'geoObject.addon.hint',
+              'control.ZoomControl',
+              'control.FullscreenControl'
+            ]}
           >
-            {mapError ? (
-              <div className="map-error">
-                <h3>Ошибка карты</h3>
-                <p>{mapError}</p>
-              </div>
-            ) : (
-              <GoogleMap
-                mapContainerStyle={mapContainerStyle}
-                zoom={8}
-                center={center}
-                onClick={handleMapClick}
-                onLoad={(map) => {
-                  console.log('Map component loaded');
-                  handleMapLoad(map);
-                }}
-                onError={(error) => {
-                  console.error('Map Error:', error);
-                  setMapError('Ошибка инициализации карты');
+            {dbPins && dbPins.map((mark) => (
+              <Placemark
+                key={mark.id}
+                geometry={[parseFloat(mark.lat), parseFloat(mark.lng)]}
+                properties={{
+                  balloonContentHeader: `<div style="font-size: 14px; font-weight: bold; color: #333;">${mark.title}</div>`,
+                  balloonContentBody: `
+                    <div style="padding: 10px 0;">
+                      <div style="margin-bottom: 8px;">
+                        <strong style="color: #666;">Категория:</strong> ${categoryIcons[mark.category]} ${mark.category}
+                      </div>
+                      <div style="margin-bottom: 8px;">
+                        <strong style="color: #666;">Статус:</strong> ${mark.status === 'active' ? '⚡ Активная' : mark.status === 'inProgress' ? '🔄 В работе' : '✅ Убрано'}
+                      </div>
+                      <div style="color: #333; line-height: 1.4;">
+                        ${mark.description}
+                      </div>
+                    </div>
+                  `,
+                  hintContent: `${categoryIcons[mark.category]} ${mark.title}`,
+                  iconContent: categoryIcons[mark.category]
                 }}
                 options={{
-                  styles: [
-                    {
-                      featureType: "all",
-                      elementType: "all",
-                      stylers: [
-                        { saturation: -50 }
-                      ]
-                    }
-                  ],
-                  gestureHandling: 'greedy',
-                  disableDoubleClickZoom: true
+                  preset: mark.status === 'resolved' ? 'islands#greenStretchyIcon' :
+                          mark.status === 'inProgress' ? 'islands#orangeStretchyIcon' : 'islands#redStretchyIcon',
+                  iconColor: mark.category === 'warning' ? '#ff4444' :
+                            mark.category === 'info' ? '#4CAF50' :
+                            mark.category === 'event' ? '#2196F3' :
+                            mark.category === 'construction' ? '#FF9800' :
+                            mark.category === 'plastic' ? '#9C27B0' : '#f44336',
+                  iconShape: {
+                    type: 'Circle',
+                    coordinates: [0, 0],
+                    radius: 20
+                  },
+                  iconImageSize: [36, 36],
+                  iconImageOffset: [-18, -18],
+                  hideIconOnBalloonOpen: false,
+                  balloonMaxWidth: 300,
+                  balloonMaxHeight: 200,
+                  balloonAutoPan: true
                 }}
-              >
-                {dbPins && dbPins.map((mark) => (
-                  <Marker
-                    key={mark.id}
-                    position={{ 
-                      lat: parseFloat(mark.lat), 
-                      lng: parseFloat(mark.lng)
-                    }}
-                    onClick={() => handlePinClick(mark)}
-                    label={{
-                      text: categoryIcons[mark.category] || '📍',
-                      className: 'marker-label'
-                    }}
-                    title={mark.title}
-                  />
-                ))}
-              </GoogleMap>
-            )}
-          </LoadScript>
-        )}
+                onClick={() => handlePinClick(mark)}
+              />
+            ))}
+          </Map>
+        </YMaps>
       </div>
 
       {selectedPin && (
