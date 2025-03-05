@@ -1,184 +1,136 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { dbOperations, initDB } from '../utils/db';
+import { useState, useEffect, useCallback } from 'react';
+import { getDB } from '../utils/db';
 
-export const useDatabase = () => {
+export function useDatabase() {
     const [pins, setPins] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const initialized = useRef(false);
+    const [initialized, setInitialized] = useState(false);
 
-    // Initialize database
     const initialize = useCallback(async () => {
-        if (initialized.current) return;
         try {
-            await initDB();
-            initialized.current = true;
-            console.log('Database initialized');
+            const db = await getDB();
+            setInitialized(true);
+            return db;
         } catch (err) {
             console.error('Failed to initialize database:', err);
             setError('Failed to initialize database');
+            return null;
         }
     }, []);
 
-    // Load all pins
     const loadPins = useCallback(async () => {
-        if (!initialized.current) {
-            await initialize();
-        }
         try {
-            setLoading(true);
+            const db = await getDB();
+            const allPins = await db.getAllPins();
+            
+            const formattedPins = allPins.map(pin => ({
+                ...pin,
+                lat: parseFloat(pin.lat),
+                lng: parseFloat(pin.lng)
+            }));
+
+            setPins(formattedPins);
+            setLoading(false);
             setError(null);
-            console.log('Loading pins from database...');
-            const allPins = await dbOperations.getAllPins();
-            console.log('Loaded pins:', allPins);
-            if (Array.isArray(allPins)) {
-                // Ensure all coordinates are numbers
-                const formattedPins = allPins.map(pin => ({
-                    ...pin,
-                    lat: parseFloat(pin.lat),
-                    lng: parseFloat(pin.lng)
-                }));
-                setPins(formattedPins);
-                console.log('Formatted pins:', formattedPins);
-            } else {
-                console.warn('No pins found or invalid data format');
-                setPins([]);
-            }
         } catch (err) {
             console.error('Error loading pins:', err);
-            setError(err.message);
             setPins([]);
-        } finally {
             setLoading(false);
+            setError('Failed to load pins');
         }
-    }, [initialize]);
+    }, []);
 
-    // Initialize database and load pins on mount
     useEffect(() => {
         const init = async () => {
-            await initialize();
-            await loadPins();
+            const db = await initialize();
+            if (db) {
+                await loadPins();
+            }
         };
         init();
-
-        // Reload pins when the page becomes visible
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                console.log('Page became visible, reloading pins...');
-                loadPins();
-            }
-        };
-
-        // Reload pins when storage changes (for cross-tab synchronization)
-        const handleStorageChange = (event) => {
-            if (event.key === 'pinsUpdated') {
-                console.log('Storage changed, reloading pins...');
-                loadPins();
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('storage', handleStorageChange);
-
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('storage', handleStorageChange);
-        };
     }, [initialize, loadPins]);
 
-    // Add a new pin
-    const addPin = async (pinData) => {
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                loadPins();
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, [loadPins]);
+
+    useEffect(() => {
+        const handleStorageChange = (e) => {
+            if (e.key === 'pins') {
+                loadPins();
+            }
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, [loadPins]);
+
+    const addPin = async (pin) => {
         try {
-            setLoading(true);
-            setError(null);
-            console.log('Adding new pin:', pinData);
-            const newPinId = await dbOperations.addPin(pinData);
-            const newPin = { ...pinData, id: newPinId };
-            setPins(currentPins => [...currentPins, newPin]);
-            console.log('Pin added successfully with ID:', newPinId);
-            return newPinId;
+            const db = await getDB();
+            await db.addPin(pin);
+            await loadPins();
+            return true;
         } catch (err) {
             console.error('Error adding pin:', err);
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
+            setError('Failed to add pin');
+            return false;
         }
     };
 
-    // Update an existing pin
-    const updatePin = async (id, pinData) => {
+    const updatePin = async (id, pin) => {
         try {
-            setLoading(true);
-            setError(null);
-            console.log('Updating pin:', id, pinData);
-            await dbOperations.updatePin(id, pinData);
-            setPins(currentPins => 
-                currentPins.map(pin => 
-                    pin.id === id ? { ...pinData, id } : pin
-                )
-            );
-            console.log('Pin updated successfully');
+            const db = await getDB();
+            await db.updatePin(id, pin);
+            await loadPins();
+            return true;
         } catch (err) {
             console.error('Error updating pin:', err);
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
+            setError('Failed to update pin');
+            return false;
         }
     };
 
-    // Delete a pin
     const deletePin = async (id) => {
         try {
-            setLoading(true);
-            setError(null);
-            console.log('Deleting pin:', id);
-            await dbOperations.deletePin(id);
-            setPins(currentPins => currentPins.filter(pin => pin.id !== id));
-            console.log('Pin deleted successfully');
+            const db = await getDB();
+            await db.deletePin(id);
+            await loadPins();
+            return true;
         } catch (err) {
             console.error('Error deleting pin:', err);
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
+            setError('Failed to delete pin');
+            return false;
         }
     };
 
-    // Get pins by category
     const getPinsByCategory = async (category) => {
         try {
-            setLoading(true);
-            setError(null);
-            console.log('Getting pins by category:', category);
-            const categoryPins = await dbOperations.getPinsByCategory(category);
-            setPins(categoryPins || []);
-            console.log('Retrieved pins by category:', categoryPins);
+            const db = await getDB();
+            const categoryPins = await db.getPinsByCategory(category);
+            return categoryPins;
         } catch (err) {
             console.error('Error getting pins by category:', err);
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
+            setError('Failed to get pins by category');
+            return [];
         }
     };
 
-    // Get pins by status
     const getPinsByStatus = async (status) => {
         try {
-            setLoading(true);
-            setError(null);
-            console.log('Getting pins by status:', status);
-            const statusPins = await dbOperations.getPinsByStatus(status);
-            setPins(statusPins || []);
-            console.log('Retrieved pins by status:', statusPins);
+            const db = await getDB();
+            const statusPins = await db.getPinsByStatus(status);
+            return statusPins;
         } catch (err) {
             console.error('Error getting pins by status:', err);
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
+            setError('Failed to get pins by status');
+            return [];
         }
     };
 
@@ -189,8 +141,8 @@ export const useDatabase = () => {
         addPin,
         updatePin,
         deletePin,
-        loadPins,
         getPinsByCategory,
-        getPinsByStatus
+        getPinsByStatus,
+        loadPins
     };
-}; 
+} 
